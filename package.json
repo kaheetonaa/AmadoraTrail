@@ -10,7 +10,8 @@
     "vite": "^6.0.3"
   },
   "dependencies": {
-    "ol": "latest"
+    "ol": "latest",
+    "rollup": "^4.28.1"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.9.5"
