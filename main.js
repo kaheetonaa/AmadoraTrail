@@ -3,13 +3,15 @@ import Map from 'ol/Map.js';
 import OSMXML from 'ol/format/OSMXML.js';
 import VectorSource from 'ol/source/Vector.js';
 import View from 'ol/View.js';
-import { Circle as CircleStyle, Fill, Stroke, Style, Icon } from 'ol/style.js';
+import { Circle as CircleStyle, Fill, Stroke, Style, Icon,Text } from 'ol/style.js';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer.js';
 import { bbox as bboxStrategy } from 'ol/loadingstrategy.js';
 import Feature from 'ol/Feature.js';
 import { Point, LineString } from 'ol/geom.js';
 import { fromLonLat, transform } from 'ol/proj.js';
 import GPX from 'ol/format/GPX.js';
+import Overlay from 'ol/Overlay.js';
+
 
 let map = null;
 
@@ -81,10 +83,12 @@ var utils = {
 };
 
 var points = [],
+  popover,
+  element = document.getElementById('popup'),
   msg_el = document.getElementById('msg'),
   btn_add = document.getElementById('add'),
   btn_download = document.getElementById('download'),
-  btn_clear = document.getElementById('clear'),
+  btn_undo = document.getElementById('undo'),
   url_osrm_nearest = 'https://router.project-osrm.org/nearest/v1/driving/',
   url_osrm_route = 'https://api.openrouteservice.org/v2/directions/foot-walking?api_key=5b3ce3597851110001cf6248813cfcafdf4f44bd81487daab2f2cbec',
   icon_url = 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png',
@@ -92,15 +96,18 @@ var points = [],
   wayFindingStyles = {
     route: new Style({
       stroke: new Stroke({
-        width: 6, color: [40, 40, 40, 0.8]
+        width: 6, color: [255, 0, 0, 0.8]
       })
     }),
     icon: new Style({
-      image: new Icon({
-        anchor: [0.5, 1],
-        src: icon_url
+        image: new CircleStyle({
+          radius: 5,
+          fill: new Fill({
+            color: 'red'
+          }),
+          stroke: null,
+        }),
       })
-    })
   },
   wayFindingVectorLayer = new VectorLayer({
     source: wayFindingSource
@@ -170,7 +177,18 @@ const raster = new TileLayer({
   }),
 });
 
+const popup = new Overlay({
+  element: element,
+  positioning: 'bottom-center',
+  stopEvent: false,
+});
 
+function disposePopover() {
+  if (popover) {
+    popover.dispose();
+    popover = undefined;
+  }
+}
 
 map = new Map({
   layers: [raster, vector, wayFindingVectorLayer],
@@ -185,6 +203,42 @@ map = new Map({
   }),
 });
 
+map.addOverlay(popup);
+
+map.on('click', function (evt) {
+  const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
+    return feature;
+  });
+  disposePopover();
+  if (!feature) {
+    return;
+  }
+  let content =""
+  if (feature.get('name')!=null) {
+    content+="<b>"+feature.get('name')+"</b><br>";
+  }
+  if (feature.get('image')!=null) {
+    content+="<img src='"+feature.get('image')+"' width=200/><br>"
+  }
+
+  if (feature.get('note')!=null && feature.get('note').toLowerCase().includes('euthmappers')) {
+    content+="Mapped by EUthMappers"
+  }
+  popup.setPosition(evt.coordinate);
+  popover = new bootstrap.Popover(element, {
+    placement: 'top',
+    html: true,
+    content: content,
+  });
+  popover.show();
+});
+
+map.on('pointermove', function (e) {
+  const hit = map.hasFeatureAtPixel(e.pixel);
+  map.getTarget().style.cursor = hit ? 'pointer' : '';
+});
+// Close the popup when the map is moved
+map.on('movestart', disposePopover);
 
 btn_add.addEventListener('click', function () {
   let coord_street = transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
@@ -225,10 +279,13 @@ btn_download.addEventListener('click', () => {
   utils.serialize(wayFindingSource.getFeatures())
 })
 
-btn_clear.addEventListener('click', () => {
+btn_undo.addEventListener('click', () => {
   msg_el.innerHTML = 'Add point to start the trip.';
-  wayFindingSource.clear();
-  points = [];
+  let features = wayFindingSource.getFeatures();
+  points.pop();
+  console.log(features.length)
+  wayFindingSource.removeFeature(features[features.length - 1]);
+  wayFindingSource.removeFeature(features[features.length - 2]);
 })
 
 

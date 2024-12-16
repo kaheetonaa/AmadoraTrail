@@ -5,8 +5,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
   <title>OSM XML</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Playwrite+DE+VA+Guides&family=Sedgwick+Ave&display=swap');
+
     #map {
       position: absolute;
       left: 5vh;
@@ -16,49 +18,92 @@
       height: 90vh;
       z-index: -1;
     }
+
     #cross {
       position: absolute;
 
       width: 3%;
       z-index: 2;
     }
+
     @media screen and (orientation:portrait) {
       #cross {
         width: 3vh;
         left: calc(50% - 1.5vh);
         top: calc(45vh - 1.5vh);
       }
-      #title{
-        font-size:8vw;
+
+      #title {
+        font-size: 8vw;
+      }
+
+      .btn {
+        font-size: 3vw;
       }
     }
+
     @media screen and (orientation:landscape) {
       #cross {
         width: 3vw;
         left: calc(50% - 1.5vw);
         top: calc(45vh - 1.5vw);
       }
-      #title{
-        font-size:8vh;
+
+      #title {
+        font-size: 8vh;
+      }
+
+      .btn {
+        font-size: 3vh;
       }
     }
+
     .btn {
       position: absolute;
+      background-color: red;
+      color: white;
       z-index: 100;
-      bottom: 5%;
+      bottom: 20%;
+      display: inline-block;
+      padding: 10px 10px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      outline: none;
+      color: #fff;
+      background-color: #FF0000;
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 9px #999;
     }
+
+    .btn:hover {
+      background-color: #AA0000;
+    }
+
+    .btn:active {
+      background-color: #AA0000;
+      box-shadow: 0 5px #666;
+      transform: translateY(4px);
+    }
+
+    #undo {
+      left: 5%;
+    }
+
     #add {
-      left: 10%;
+      left: 50%;
+      -ms-transform: translateX(-50%);
+      transform: translateX(-50%);
     }
-    #clear {
-      left: 40%;
-    }
+
     #download {
-      left: 70%;
+      right: 5%;
     }
+
     #title {
       position: absolute;
-      bottom: 10%;
+      bottom: 7.5%;
       left: 5%;
       font-family: "Sedgwick Ave", cursive;
       font-weight: 400;
@@ -66,17 +111,20 @@
       color: blue;
     }
   </style>
-  <script type="module" crossorigin src="assets/index-C6M-rmeG.js"></script>
+  <script type="module" crossorigin src="assets/index-CKzouFVL.js"></script>
   <link rel="stylesheet" crossorigin href="assets/index-BtPuoxOl.css">
 </head>
 
 <body>
-  <div id="map"><img src="assets/cross-C3LzXQDS.png" id="cross"></div>
+  <div id="map"><img src="assets/cross-C3LzXQDS.png" id="cross" />
+    <div id="popup"></div>
+  </div>
   <div id="msg">Add point to start the trip.</div>
   <b id="title">Amadora Graffiti Map</b>
   <button id='add' class="btn">Add Point</button>
   <button id='download' class="btn">Download</button>
-  <button id='clear' class="btn">Clear</button>
+  <button id='undo' class="btn">Undo</button>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
