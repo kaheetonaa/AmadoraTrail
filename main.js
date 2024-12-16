@@ -35,7 +35,7 @@ var utils = {
       geometry: new Point(fromLonLat(coord))
     });
     feature.setStyle(wayFindingStyles.icon);
-    wayFindingSource.addFeature(feature);
+    wayFindingPointSource.addFeature(feature);
   },
   createRoute: function (locations) {
     // route is ol.geom.LineString
@@ -91,7 +91,7 @@ var points = [],
   btn_undo = document.getElementById('undo'),
   url_osrm_nearest = 'https://router.project-osrm.org/nearest/v1/driving/',
   url_osrm_route = 'https://api.openrouteservice.org/v2/directions/foot-walking?api_key=5b3ce3597851110001cf6248813cfcafdf4f44bd81487daab2f2cbec',
-  icon_url = 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png',
+  wayFindingPointSource = new VectorSource(),
   wayFindingSource = new VectorSource(),
   wayFindingStyles = {
     route: new Style({
@@ -111,6 +111,9 @@ var points = [],
   },
   wayFindingVectorLayer = new VectorLayer({
     source: wayFindingSource
+  }),
+  wayFindingPointVectorLayer = new VectorLayer({
+    source: wayFindingPointSource
   });
 
 const styles = {
@@ -191,7 +194,7 @@ function disposePopover() {
 }
 
 map = new Map({
-  layers: [raster, vector, wayFindingVectorLayer],
+  layers: [raster, vector, wayFindingVectorLayer,wayFindingPointVectorLayer],
   target: document.getElementById('map'),
   view: new View({
     projection: 'EPSG:3857',
@@ -282,10 +285,10 @@ btn_download.addEventListener('click', () => {
 btn_undo.addEventListener('click', () => {
   msg_el.innerHTML = 'Add point to start the trip.';
   let features = wayFindingSource.getFeatures();
+  let featuresPoint = wayFindingPointSource.getFeatures();
   points.pop();
-  console.log(features.length)
   wayFindingSource.removeFeature(features[features.length - 1]);
-  wayFindingSource.removeFeature(features[features.length - 2]);
+  wayFindingPointSource.removeFeature(featuresPoint[featuresPoint.length - 1]);
 })
 
 
