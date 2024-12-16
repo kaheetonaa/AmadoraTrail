@@ -178,8 +178,9 @@ map = new Map({
   view: new View({
     projection: 'EPSG:3857',
     center: utils.to3857([-9.2241307, 38.75594191880209]),
-    maxZoom: 19,
-    zoom: 17,
+    maxZoom: 20,
+    zoom: 18,
+    minZoom: 16
   }),
 });
 

@@ -11,24 +11,40 @@
         top:0;
         margin:0;
         width: 100%;
-        height: 100vh;
+        height: 80vh;
         z-index:-1;
       }
       #cross{
         position: absolute;
         left:calc(50% - 1.5%);
-        top:calc(50vh - 1.5vh);
+        top:calc(40vh - 1.5vw);
         width:3%;
         z-index:2;
       }
       .btn{
+        position:absolute;
         z-index:100;
+        bottom:5%;
+      }
+      #add {
+        left:10%;
+      }
+      #clear {
+        left:40%;
+      }
+      #download{
+        left:70%;
+      }
+      #title{
+        position:absolute;
+        bottom:15%;
       }
     </style>
   </head>
   <body>
     <div id="map"><img src="assets/cross.png" id="cross"></div>
     <div id="msg">Click to add a point.</div>
+    <b id="title">Amadora Trail</b>
     <button id='add' class="btn">Add Point</button>
     <button id='download' class="btn">Download</button>
     <button id='clear' class="btn">Clear</button>
