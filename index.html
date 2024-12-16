@@ -10,28 +10,42 @@
         top:0;
         margin:0;
         width: 100%;
-        height: 60vh;
+        height: 80vh;
         z-index:-1;
       }
       #cross{
         position: absolute;
         left:calc(50% - 1.5%);
-        top:calc(30vh - 1.5vw);
+        top:calc(40vh - 1.5vw);
         width:3%;
         z-index:2;
       }
       .btn{
         position:absolute;
         z-index:100;
-        left: 10%;
+        bottom:5%;
+      }
+      #add {
+        left:10%;
+      }
+      #clear {
+        left:40%;
+      }
+      #download{
+        left:70%;
+      }
+      #title{
+        position:absolute;
+        bottom:15%;
       }
     </style>
-    <script type="module" crossorigin src="assets/index-sCGyCQ3s.js"></script>
-    <link rel="stylesheet" crossorigin href="assets/index-BtPuoxOl.css">
+    <script type="module" crossorigin src="/assets/index-CP428cSS.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BtPuoxOl.css">
   </head>
   <body>
-    <div id="map"><img src="assets/cross-C3LzXQDS.png" id="cross"></div>
+    <div id="map"><img src="/assets/cross-C3LzXQDS.png" id="cross"></div>
     <div id="msg">Click to add a point.</div>
+    <b id="title">Amadora Trail</b>
     <button id='add' class="btn">Add Point</button>
     <button id='download' class="btn">Download</button>
     <button id='clear' class="btn">Clear</button>
