@@ -180,7 +180,7 @@ map = new Map({
     center: utils.to3857([-9.2241307, 38.75594191880209]),
     maxZoom: 20,
     zoom: 18,
-    minZoom: 16,
+    minZoom: 15,
     constrainResolution: true
   }),
 });
@@ -226,6 +226,7 @@ btn_download.addEventListener('click', () => {
 })
 
 btn_clear.addEventListener('click', () => {
+  msg_el.innerHTML = 'Add point to start the trip.';
   wayFindingSource.clear();
   points = [];
 })

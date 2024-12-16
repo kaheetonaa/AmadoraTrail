@@ -1,65 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
-    <title>OSM XML</title>
-    <link rel="stylesheet" href="node_modules/ol/ol.css">
-    <style>
-      #map {
-        position:absolute;
-        left:5vh;
-        top:5vh;
-        margin:0;
-        width: calc(100% - 10vh);
-        height: 90vh;
-        z-index:-1;
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+  <title>OSM XML</title>
+  <link rel="stylesheet" href="node_modules/ol/ol.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Playwrite+DE+VA+Guides&family=Sedgwick+Ave&display=swap');
+    #map {
+      position: absolute;
+      left: 5vh;
+      top: 5vh;
+      margin: 0;
+      width: calc(100% - 10vh);
+      height: 90vh;
+      z-index: -1;
+    }
+
+    #cross {
+      position: absolute;
+
+      width: 3%;
+      z-index: 2;
+    }
+
+    @media screen and (orientation:portrait) {
+      #cross {
+        width: 3vh;
+        left: calc(50% - 1.5vh);
+        top: calc(45vh - 1.5vh);
       }
-      #cross{
-        position: absolute;
-        left:calc(50% - 1.5%);
-        top:calc(45vh - 1.5vw);
-        width:3%;
-        z-index:2;
-      }
-      @media screen and (orientation:portrait) {
-      #cross{
-        width:3vh;
+      #title{
+        font-size:8vw;
       }
     }
 
     @media screen and (orientation:landscape) {
-      #cross{
-        width:3vw;
-      }
-    }
-      .btn{
-        position:absolute;
-        z-index:100;
-        bottom:5%;
-      }
-      #add {
-        left:10%;
-      }
-      #clear {
-        left:40%;
-      }
-      #download{
-        left:70%;
+      #cross {
+        width: 3vw;
+        left: calc(50% - 1.5vw);
+        top: calc(45vh - 1.5vw);
       }
       #title{
-        position:absolute;
-        bottom:15%;
+        font-size:8vh;
       }
-    </style>
-  </head>
-  <body>
-    <div id="map"><img src="assets/cross.png" id="cross"></div>
-    <div id="msg">Click to add a point.</div>
-    <b id="title">Amadora Trail</b>
-    <button id='add' class="btn">Add Point</button>
-    <button id='download' class="btn">Download</button>
-    <button id='clear' class="btn">Clear</button>
-    <script type="module" src="main.js"></script>
-  </body>
+    }
+
+    .btn {
+      position: absolute;
+      z-index: 100;
+      bottom: 5%;
+    }
+
+    #add {
+      left: 10%;
+    }
+
+    #clear {
+      left: 40%;
+    }
+
+    #download {
+      left: 70%;
+    }
+
+    #title {
+      position: absolute;
+      bottom: 10%;
+      left: 5%;
+      font-family: "Sedgwick Ave", cursive;
+      font-weight: 400;
+      font-style: normal;
+      color: blue;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"><img src="assets/cross.png" id="cross"></div>
+  <div id="msg">Add point to start the trip.</div>
+  <b id="title">Amadora Graffiti Map</b>
+  <button id='add' class="btn">Add Point</button>
+  <button id='download' class="btn">Download</button>
+  <button id='clear' class="btn">Clear</button>
+  <script type="module" src="main.js"></script>
+</body>
+
 </html>
