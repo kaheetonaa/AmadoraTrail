@@ -180,7 +180,8 @@ map = new Map({
     center: utils.to3857([-9.2241307, 38.75594191880209]),
     maxZoom: 20,
     zoom: 18,
-    minZoom: 16
+    minZoom: 16,
+    constrainResolution: true
   }),
 });
 
