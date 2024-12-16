@@ -3,31 +3,31 @@ import Map from 'ol/Map.js';
 import OSMXML from 'ol/format/OSMXML.js';
 import VectorSource from 'ol/source/Vector.js';
 import View from 'ol/View.js';
-import {Circle as CircleStyle, Fill, Stroke, Style,Icon} from 'ol/style.js';
-import {Tile as TileLayer, Vector as VectorLayer} from 'ol/layer.js';
-import {bbox as bboxStrategy} from 'ol/loadingstrategy.js';
+import { Circle as CircleStyle, Fill, Stroke, Style, Icon } from 'ol/style.js';
+import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer.js';
+import { bbox as bboxStrategy } from 'ol/loadingstrategy.js';
 import Feature from 'ol/Feature.js';
-import {Point} from 'ol/geom.js';
-import {fromLonLat,transform} from 'ol/proj.js';
-import Polyline from 'ol/format/Polyline.js';
+import { Point, LineString } from 'ol/geom.js';
+import { fromLonLat, transform } from 'ol/proj.js';
+import GPX from 'ol/format/GPX.js';
 
 let map = null;
 
 var utils = {
-  getNearest: function(coord){
-    var coord4326 = utils.to4326(coord);    
-    return new Promise(function(resolve, reject) {
+  getNearest: function (coord) {
+    var coord4326 = utils.to4326(coord);
+    return new Promise(function (resolve, reject) {
       //make sure the coord is on street
-      fetch(url_osrm_nearest + coord4326.join()).then(function(response) { 
+      fetch(url_osrm_nearest + coord4326.join()).then(function (response) {
         // Convert to JSON
         return response.json();
-      }).then(function(json) {
+      }).then(function (json) {
         if (json.code === 'Ok') resolve(json.waypoints[0].location);
         else reject();
       });
     });
   },
-  createFeature: function(coord) {
+  createFeature: function (coord) {
     var feature = new Feature({
       type: 'place',
       geometry: new Point(fromLonLat(coord))
@@ -35,59 +35,76 @@ var utils = {
     feature.setStyle(wayFindingStyles.icon);
     wayFindingSource.addFeature(feature);
   },
-  createRoute: function(polyline) {
+  createRoute: function (locations) {
     // route is ol.geom.LineString
-    var route = new Polyline({
-      factor: 1e5
-    }).readGeometry(polyline, {
-      dataProjection: 'EPSG:4326',
-      featureProjection: 'EPSG:3857'
-    });
-    var feature = new Feature({
-      type: 'route',
-      geometry: route
-    });
+    let polyline = new LineString(locations).transform('EPSG:4326', 'EPSG:3857');
+    let feature = new Feature(polyline);
     feature.setStyle(wayFindingStyles.route);
     wayFindingSource.addFeature(feature);
+    console.log(wayFindingSource.getFeatures())
   },
-  to4326: function(coord) {
-    let a= transform([
+  to4326: function (coord) {
+    let a = transform([
       parseFloat(coord[0]), parseFloat(coord[1])
-     ], 'EPSG:3857', 'EPSG:4326');
+    ], 'EPSG:3857', 'EPSG:4326');
 
-    return a;  
+    return a;
   },
-  to3857: function(coord) {
-    let a= transform([
+  to3857: function (coord) {
+    let a = transform([
       parseFloat(coord[0]), parseFloat(coord[1])
-     ], 'EPSG:4326', 'EPSG:3857');
+    ], 'EPSG:4326', 'EPSG:3857');
 
-    return a;  
+    return a;
+  },
+  downloadString: function (text, fileType, fileName) {
+    var blob = new Blob([text], { type: fileType });
+
+    var a = document.createElement('a');
+    a.download = fileName;
+    a.href = URL.createObjectURL(blob);
+    a.dataset.downloadurl = [fileType, a.download, a.href].join(':');
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
+  },
+  serialize: function (feature) {
+    console.log(feature)
+    var str = new GPX();
+
+    let output = str.writeFeatures(feature, { featureProjection: map.getView().getProjection() });
+    console.log(output);
+    utils.downloadString(output, "gpx", "Output.gpx")
   }
 };
 
 var points = [],
-    msg_el = document.getElementById('msg'),
-    url_osrm_nearest = 'https://router.project-osrm.org/nearest/v1/driving/',
-    url_osrm_route = 'https://router.project-osrm.org/route/v1/driving/',
-    icon_url = 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png',
-    wayFindingSource = new VectorSource(),
-    wayFindingVectorLayer = new VectorLayer({
-      source: wayFindingSource
-    }),
-    wayFindingStyles = {
-      route: new Style({
-        stroke: new Stroke({
-          width: 6, color: [40, 40, 40, 0.8]
-        })
-      }),
-      icon: new Style({
-        image: new Icon({
-          anchor: [0.5, 1],
-          src: icon_url
-        })
+  msg_el = document.getElementById('msg'),
+  btn_add = document.getElementById('add'),
+  btn_download = document.getElementById('download'),
+  btn_clear = document.getElementById('clear'),
+  url_osrm_nearest = 'https://router.project-osrm.org/nearest/v1/driving/',
+  url_osrm_route = 'https://api.openrouteservice.org/v2/directions/foot-walking?api_key=5b3ce3597851110001cf6248813cfcafdf4f44bd81487daab2f2cbec',
+  icon_url = 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png',
+  wayFindingSource = new VectorSource(),
+  wayFindingStyles = {
+    route: new Style({
+      stroke: new Stroke({
+        width: 6, color: [40, 40, 40, 0.8]
       })
-    };
+    }),
+    icon: new Style({
+      image: new Icon({
+        anchor: [0.5, 1],
+        src: icon_url
+      })
+    })
+  },
+  wayFindingVectorLayer = new VectorLayer({
+    source: wayFindingSource
+  });
 
 const styles = {
   'artwork_type': {
@@ -111,7 +128,7 @@ const vectorSource = new VectorSource({
     client.open('POST', 'https://overpass-api.de/api/interpreter');
     client.addEventListener('load', function () {
       const features = new OSMXML().readFeatures(client.responseText, {
-      featureProjection: map.getView().getProjection(),
+        featureProjection: map.getView().getProjection(),
       });
       vectorSource.addFeatures(features);
       success(features);
@@ -153,48 +170,62 @@ const raster = new TileLayer({
   }),
 });
 
-  
+
 
 map = new Map({
-  layers: [raster, vector,wayFindingVectorLayer],
+  layers: [raster, vector, wayFindingVectorLayer],
   target: document.getElementById('map'),
   view: new View({
     projection: 'EPSG:3857',
-    center: utils.to3857([-9.2241307,38.75594191880209]),
+    center: utils.to3857([-9.2241307, 38.75594191880209]),
     maxZoom: 19,
     zoom: 17,
   }),
 });
 
 
-map.on('click', function(evt){
-  utils.getNearest(evt.coordinate).then(function(coord_street){
-    var last_point = points[points.length - 1];
-    var points_length = points.push(coord_street);
+btn_add.addEventListener('click', function () {
+  let coord_street = transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
+  //utils.getNearest(evt.coordinate).then(function(coord_street){
+  var last_point = points[points.length - 1];
+  var points_length = points.push(coord_street);
 
-    utils.createFeature(coord_street);
-    
+  utils.createFeature(coord_street);
 
-    if (points_length < 2) {
-      msg_el.innerHTML = 'Click to add another point';
+
+  if (points_length < 2) {
+    msg_el.innerHTML = 'Click to add another point';
+    return;
+  }
+
+  //get the route
+  var point1 = last_point.join();
+  var point2 = coord_street.join();
+
+  fetch(url_osrm_route + '&start=' + point1 + '&end=' + point2).then(function (r) {
+    return r.json();
+  }).then(function (json) {
+    let polyline = json['features'][0].geometry.coordinates;
+    console.log(polyline)
+    if (json['error']) {
+      msg_el.innerHTML = 'No route found.';
       return;
     }
+    msg_el.innerHTML = 'Route added';
+    //points.length = 0;
 
-    //get the route
-    var point1 = last_point.join();
-    var point2 = coord_street.join();
-    
-    fetch(url_osrm_route + point1 + ';' + point2).then(function(r) { 
-      return r.json();
-    }).then(function(json) {
-      if(json.code !== 'Ok') {
-        msg_el.innerHTML = 'No route found.';
-        return;
-      }
-      msg_el.innerHTML = 'Route added';
-      //points.length = 0;
-      utils.createRoute(json.routes[0].geometry);
-    });
+    utils.createRoute(polyline);
   });
+  //});
 });
+
+btn_download.addEventListener('click', () => {
+  utils.serialize(wayFindingSource.getFeatures())
+})
+
+btn_clear.addEventListener('click', () => {
+  wayFindingSource.clear();
+  points = [];
+})
+
 
