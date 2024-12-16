@@ -169,7 +169,7 @@ const vector = new VectorLayer({
 });
 
 const attributions =
-  '<a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>';
+  '<a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a><br><i>EuthMappers 2024</i>';
 
 const raster = new TileLayer({
   source: new ImageTile({
